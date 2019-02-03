@@ -1,0 +1,56 @@
+body{
+    background-image: url("positive.png")
+}
+.jumbotron{
+    background: #fff000;
+    width: 80%;
+    margin: 5% 10%;
+}
+#header{
+    font-family: 'Monoton', cursive;
+    font-size: 100px;
+    text-align: center;
+}
+.subtitle{
+    font-family: 'Open Sans Condensed', sans-serif;
+    font-size:  45px;
+    text-align: center;
+}
+.submit{
+    border-radius: 10px;
+    color: white;
+    background: black;
+    padding: 10x;
+    margin: 5px;
+    float: right;
+    width: 15%;
+}
+.card{
+    width: 70%;
+    margin: 5% 15%;
+}
+.card-header{
+    font-family: 'Open Sans Condensed', sans-serif;
+    font-size: 35px;
+    background: #fff000;
+}
+th{
+    font-family: 'Open Sans Condensed', sans-serif;
+    font-size: 25px;
+    /* text-decoration: underline; */
+}
+td{
+    font-family: 'VT323', monospace;
+    font-size: 25px;
+}
+.input{
+    border-radius: 10px;
+    border-color:black;
+    border: solid;
+    width: 100%;
+}
+form{
+    font-family: 'Open Sans Condensed', sans-serif;
+    font-size: 25px;
+    
+}
