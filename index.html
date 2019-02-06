@@ -2,7 +2,8 @@
 
 <head>
     <!-- bootstrap -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
+        crossorigin="anonymous">
     <!-- my stylesheet -->
     <link rel="stylesheet" href="style.css">
     <!-- fonts -->
@@ -10,7 +11,7 @@
     <!-- icons -->
     <script src="https://use.fontawesome.com/b0bb7ec5fc.js"></script>
     <!-- moments.js -->
-     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
 
     <title>Train Times</title>
 </head>
@@ -36,7 +37,7 @@
             </table>
         </div>
     </div>
-    
+
     <div id="add-train" class="card">
         <div class="card-header"> <i class="fa fa-train" aria-hidden="true"></i> Add Train</div>
         <div class="card-body">
@@ -48,7 +49,7 @@
                 First Train Time (HH:mm-military time)<br>
                 <input id="first-train" class="input" type="text" name="firstTrain"><br>
                 Frequency <br>
-                <input id="frequency" class="input" type="text" name="frequency"><br>            
+                <input id="frequency" class="input" type="text" name="frequency"><br>
                 <br>
                 <input id="submit" class="submit" type="submit" value="Submit">
             </form>
@@ -78,6 +79,9 @@
 
     var database = firebase.database();
 
+    var nextTrain;
+    var tMinutesTillTrain;
+
     $("#submit").on("click", function (event) {
 
         event.preventDefault();
@@ -86,93 +90,62 @@
         var name = $("#train-name").val().trim();
         var destination = $("#destination").val().trim();
         var firstTrain = $("#first-train").val().trim();
-        var frequency = $("#frequency").val().trim();
-   
-
-        // console.log(name);
-        // console.log(destination);
-        // console.log(frequency);
-        // console.log(nextArrival);
-        // console.log(minutesAway);
+        var tFrequency = $("#frequency").val().trim();
 
 
+        // First Time (pushed back 1 year to make sure it comes before current time)
+        var firstTimeConverted = moment(firstTrain, "HH:mm").subtract(1, "years");
+        console.log(firstTimeConverted);
+        // Current Time
+        var currentTime = moment();
+        console.log("CURRENT TIME: " + moment(currentTime).format("hh:mm"));
+        // Difference between the times
+        var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
+        console.log("DIFFERENCE IN TIME: " + diffTime);
+        // Time apart (remainder)
+        var tRemainder = diffTime % tFrequency;
+        console.log(tRemainder);
+        // Minute Until Train
+        var tMinutesTillTrain = tFrequency - tRemainder;
+        console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
+        // Next Train
+        var nextTrain = moment().add(tMinutesTillTrain, "minutes");
+        console.log("ARRIVAL TIME: " + moment(nextTrain).format("hh:mm"));
 
+
+       
         database.ref().push({
             name: name,
             destination: destination,
-            frequency: frequency,
+            tFrequency: tFrequency,
             firstTrain: firstTrain,
-            timeNow: firebase.database.ServerValue.TIMESTAMP,
+            // Getting an error in the console with the following two lines IF I set the value to the actual variables. 
+            //  The error is saying the push won't work because "nextTrain" & "tMinutesTillTrain" are set to functions as their values!!
+            nextTrain: "5",
+            tMinutesTillTrain: "5",
         });
 
     });
 
-
-    // create variable set to firstTrain+frequency as often as the frequency
-    // subtract the current time from the above varible to get minutesAway
-    // console.log both
-    // add both to html using chilSnapshot
-
-
-    var nextArrival;
-    var minutesAway;
-
-
-    var now = moment();
-
-    console.log(now);
-
-    // function nextTrain{
-    //     if(firstTrain<moment(HH:mm){
-    //          var firstTrain = firstTrain+frequency;
-    //     }
-    // }
-
-
     database.ref().on("child_added", function (childSnapshot) {
-
         console.log(childSnapshot.val().name);
         console.log(childSnapshot.val().destination);
         console.log(childSnapshot.val().firstTrain);
-        console.log(childSnapshot.val().frequency);
-        console.log(childSnapshot.val().nextArrival);
-        console.log(childSnapshot.val().minutesAway);
-
-        // var today = (childSnapshot.val().dateAdded);
-        // var start = 
-        // console.log(start);
-        // console.log(today);
-
-        // var difference = moment().diff(moment(childSnapshot.val().startDate));
-        // console.log(difference);
-        // var duration = Math.floor(moment.duration(difference).asMonths());
-        // console.log(duration);
-
-
-        // var monthsWorked = (moment(childSnapshot.val().startDate).fromNow());
-        // // console.log(moment(monthsWorked).get('month'));   
-        // console.log(moment().subtract((childSnapshot.val().startDate)));
-        // // var todayDate = moment().millisecond();
-        // // console.log(todayDate);
-
-
-
-
-
+        console.log(childSnapshot.val().tFrequency);
+        console.log(childSnapshot.val().nextTrain);
+        console.log(childSnapshot.val().tMinutesTillTrain);
 
 
         var newTrain = $("<tr>");
         newTrain.append($("<td>").text(childSnapshot.val().name));
         newTrain.append($("<td>").text(childSnapshot.val().destination));
-        newTrain.append($("<td>").text(childSnapshot.val().frequency));
-        newTrain.append($("<td>").text(childSnapshot.val().nextArrival));
-        newTrain.append($("<td>").text(childSnapshot.val().minutesAway));
+        newTrain.append($("<td>").text(childSnapshot.val().tFrequency));
+        newTrain.append($("<td>").text(childSnapshot.val().nextTrain));
+        newTrain.append($("<td>").text(childSnapshot.val().tMinutesTillTrain));
 
         $("#trains").append(newTrain);
 
     });
-
-
 
 
 </script>
