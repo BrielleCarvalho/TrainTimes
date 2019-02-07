@@ -112,6 +112,9 @@
         var nextTrain = moment().add(tMinutesTillTrain, "minutes");
         console.log("ARRIVAL TIME: " + moment(nextTrain).format("hh:mm"));
 
+        var nextTrainResult = nextTrain;
+        console.log("does this work?" + nextTrainResult);
+
 
        
         database.ref().push({
@@ -121,8 +124,8 @@
             firstTrain: firstTrain,
             // Getting an error in the console with the following two lines IF I set the value to the actual variables. 
             //  The error is saying the push won't work because "nextTrain" & "tMinutesTillTrain" are set to functions as their values!!
-            nextTrain: "5",
-            tMinutesTillTrain: "5",
+            nextTrain: nextTrainResult.format("hh:mm").toLocaleString(),
+            tMinutesTillTrain: tMinutesTillTrain.toLocaleString()
         });
 
     });
